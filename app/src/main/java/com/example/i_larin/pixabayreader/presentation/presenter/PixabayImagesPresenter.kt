@@ -14,6 +14,10 @@ import javax.inject.Inject
 /**
  * Created by i_larin on 28.01.17.
  */
+//TODO давай заменим два метода репозитория loadDataMore и loadData на следующих два:
+// 1) Отдает обсервабл
+// 2) Просит получить элементы по строке поиска
+
 class PixabayImagesPresenter : BasePresenter<PixabayImagesView>() {
 
     @Inject
@@ -23,7 +27,9 @@ class PixabayImagesPresenter : BasePresenter<PixabayImagesView>() {
         DI.componentManager().businessLogicComponent().inject(this)
     }
 
+
     fun loadDataMore() {
+        //TODO забыл отписаться при уничтожении презентера
         pixabayImageRepository
                 .getDataMore()
                 .subscribeOn(Schedulers.io())
@@ -46,6 +52,7 @@ class PixabayImagesPresenter : BasePresenter<PixabayImagesView>() {
     fun loadData(tag: String?) {
         getView()?.showPullRefreshEnabled(true)
         Log.d("TAG", "onQueryTextChange: loadData= "+tag)
+        //TODO забыл отписаться при уничтожении презентера
         pixabayImageRepository
                 .getData(tag)
                 .subscribeOn(Schedulers.io())

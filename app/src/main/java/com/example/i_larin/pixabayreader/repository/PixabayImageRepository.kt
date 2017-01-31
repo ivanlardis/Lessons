@@ -10,6 +10,8 @@ import java.util.*
 /**
  * Created by i_larin on 28.01.17.
  */
+
+//TODO нужно программировать на уровне интерфейсов - добавь интерфейс для репозитория
 class PixabayImageRepository {
 
     private val PIXABAY_API_KEY = "4386506-63329db38400319250ee539d9"
@@ -25,8 +27,10 @@ class PixabayImageRepository {
 
     private var pageNo = 1
     private var pageSize = 20
+    //TODO обрати внимание на потоки, на которых происходит изменения данного поля
     private var total = -1
     private fun getTextQuery(): String {
+        //TODO "TEXT" надо вынести в константу
         return rxSharedPreferences.getString("TEXT", DEFAULT_TEXT).get()!!
 
     }

@@ -83,6 +83,8 @@ class PixabayImagesFragment : Fragment(), PixabayImagesView, XRecyclerView.Loadi
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true);
+        //TODO !!  - это принудительный каст к not null. его лучше не использовать вообще
+        //тут можно сделать просто inflater?.inflate(R.layout.pxabay_images_fragment, container, false)
         return inflater!!.inflate(R.layout.pxabay_images_fragment, container, false)
     }
 
