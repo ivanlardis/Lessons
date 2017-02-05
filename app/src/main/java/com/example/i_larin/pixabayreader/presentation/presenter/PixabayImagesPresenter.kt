@@ -1,84 +1,24 @@
 package com.example.i_larin.pixabayreader.presentation.presenter
 
 import android.util.Log
+import com.arellomobile.mvp.InjectViewState
+import com.arellomobile.mvp.MvpPresenter
 import com.example.i_larin.pixabayreader.di.DI
-import com.example.i_larin.pixabayreader.model.app.PixabayImage
-import com.example.i_larin.pixabayreader.network.ApiFactoty
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView
+import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.State
 import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository
-import com.example.i_larin.pixabayreader.repository.PixabayImageRepository
 import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
-import rx.schedulers.Schedulers
+import rx.subscriptions.CompositeSubscription
 import javax.inject.Inject
 
 /**
  * Created by i_larin on 28.01.17.
  */
-//TODO давай заменим два метода репозитория loadDataMore и loadData на следующих два:
-// 1) Отдает обсервабл
-// 2) Просит получить элементы по строке поиска
 
-class PixabayImagesPresenter : BasePresenter<PixabayImagesView>() {
-    companion object{
-        val TAG = "PixabayImagesPresenter"
-    }
+@InjectViewState
+class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
 
-
-    override fun attachView() {
-        compositeSubscription.add(
-                pixabayImageRepository
-
-                        .getObserverDataChange()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            getView()?.showPullRefreshEnabled(false)
-                            getView()?.showLoadingMoreProgress(false)
-                            getView()?.setTitleActionBar(it.pixabayImagesVisual.tag)
-
-
-                            Log.d(TAG, "attachView: pixabayImageRepository subscribe"+it.state.name)
-                            when (it.state) {
-                                PixabayImageRepository.State.END_ITEMS -> {
-
-                                    getView()?.showIsDataNull(it.pixabayImagesVisual.pixabayImageList)
-
-                                    getView()?.notifyUser("Конец загрузки")
-
-                                }
-                                PixabayImageRepository.State.NEXT_ITEMS -> {
-
-
-                                    getView()?.showMoreData(it.pixabayImagesVisual.pixabayImageList)
-
-
-                                }
-                                PixabayImageRepository.State.NEW_ITEMS -> {
-                                    Log.d(TAG, "attachView: pixabayImageRepository"+it.pixabayImagesVisual.pixabayImageList.size)
-
-                                    getView()?.showData(it.pixabayImagesVisual.pixabayImageList)
-
-
-                                }
-                                PixabayImageRepository.State.ERROR -> {
-                                    Log.d(TAG, "attachView: pixabayImageRepository ERROR")
-
-                                    getView()?.notifyUser(it.state.description)
-
-                                    getView()?.showIsDataNull(it.pixabayImagesVisual.pixabayImageList)
-
-                                }
-
-
-                            }
-
-                        },
-                                {},
-                                {})
-
-        )
-    }
-
+    private var compositeSubscription: CompositeSubscription = CompositeSubscription()
     @Inject
     lateinit var pixabayImageRepository: IPixabayImageRepository
 
@@ -86,20 +26,64 @@ class PixabayImagesPresenter : BasePresenter<PixabayImagesView>() {
         DI.componentManager().businessLogicComponent().inject(this)
     }
 
-
-    fun loadDataMore() {
-        Log.d(TAG, "loadDataMore: pixabayImageRepository")
-        pixabayImageRepository.loadMore(null, false)
-
+    companion object {
+        val TAG = "PixabayImagesPresenter"
     }
 
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        Log.d(TAG, "onFirstViewAttach: pixabayImageRepository")
+        viewState.showPullRefreshEnabled(true)
+        compositeSubscription.add(
+                pixabayImageRepository
+                        .getObserverDataChange()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            viewState?.showPullRefreshEnabled(false)
+                            viewState?.showLoadingMoreProgress(false)
+                            viewState?.setTitleActionBar(it.pixabayImagesVisual.tag)
+
+                            Log.d(TAG, "attachView: pixabayImageRepository subscribe" + it.state.name)
+
+                            when (it.state) {
+                                IPixabayImageRepository.State.END_ITEMS -> {
+                                    viewState?.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
+                                    viewState?.notifyUser("Конец загрузки")
+                                }
+                                IPixabayImageRepository.State.NEXT_ITEMS -> {
+                                    viewState?.showData(State.SHOW_MORE, it.pixabayImagesVisual.pixabayImageList)
+                                }
+                                IPixabayImageRepository.State.NEW_ITEMS -> {
+                                    Log.d(TAG, "attachView: pixabayImageRepository" + it.pixabayImagesVisual.pixabayImageList.size)
+                                    viewState?.showData(State.SHOW, it.pixabayImagesVisual.pixabayImageList)
+                                }
+                                IPixabayImageRepository.State.ERROR -> {
+                                    Log.d(TAG, "attachView: pixabayImageRepository ERROR")
+                                    viewState?.notifyUser(it.state.description)
+                                    viewState?.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
+                                }
+                            }
+
+                        }, {}, {})
+        )
+    }
+
+    fun loadDataMore() {
+        Log.e(TAG, "loadDataMore: pixabayImageRepository")
+        pixabayImageRepository.loadMore(null, false)
+        viewState?.showLoadingMoreProgress(true)
+    }
 
     fun loadData(tag: String?) {
-        Log.d(TAG, "loadData: pixabayImageRepository")
+        Log.e(TAG, "loadData: pixabayImageRepository")
         pixabayImageRepository.loadMore(tag, true)
-        getView()?.showPullRefreshEnabled(true)
+        viewState?.showPullRefreshEnabled(true)
+    }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeSubscription.clear()
+        Log.d(TAG, "onDestroy: PixabayImagesPresenter ")
     }
 
 }
