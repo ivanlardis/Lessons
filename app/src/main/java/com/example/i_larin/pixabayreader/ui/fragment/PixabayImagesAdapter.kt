@@ -40,20 +40,20 @@ class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapte
     }
 
     fun addPixabayImage(performer: List<PixabayImage>) {
-        dataset.addAll(performer)
+        dataset.addAll(performer.subList(dataset.size , performer.size - 1))
         notifyItemInserted(dataset.size - 1)
     }
 
-    fun updatePixabayImage(performer: List<PixabayImage>) {
-        clearPixabayImages()
-        addPixabayImage(performer)
-
+    fun updateIsNullPixabayImage(performer: List<PixabayImage>) {
+        if (dataset.size == 0) updatePixabayImage(performer)
     }
 
-    fun clearPixabayImages() {
+    fun updatePixabayImage(performer: List<PixabayImage>) {
         dataset.clear()
+        dataset.addAll(performer)
         notifyDataSetChanged()
     }
+
 
     override fun getItemCount(): Int {
         return dataset.size

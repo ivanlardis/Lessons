@@ -2,6 +2,7 @@ package com.example.i_larin.pixabayreader.di.model
 
 import com.example.i_larin.pixabayreader.network.ApiFactoty
 import com.example.i_larin.pixabayreader.network.PixabayImageApi
+import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository
 import com.example.i_larin.pixabayreader.repository.PixabayImageRepository
 import com.f2prateek.rx.preferences.RxSharedPreferences
 import dagger.Module
@@ -17,7 +18,7 @@ class BusinessLogicModule {
 
     @Provides
     @Singleton
-    fun providePixabayImageRepository(pixabayImageApi: PixabayImageApi,rxSharedPreferences: RxSharedPreferences): PixabayImageRepository {
+    fun providePixabayImageRepository(pixabayImageApi: PixabayImageApi,rxSharedPreferences: RxSharedPreferences): IPixabayImageRepository {
         return PixabayImageRepository(pixabayImageApi,rxSharedPreferences)
     }
 

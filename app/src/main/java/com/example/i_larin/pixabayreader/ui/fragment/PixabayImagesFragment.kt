@@ -23,13 +23,15 @@ import kotlinx.android.synthetic.main.pxabay_images_fragment.*
  * Created by i_larin on 28.01.17.
  */
 class PixabayImagesFragment : Fragment(), PixabayImagesView, XRecyclerView.LoadingListener, SearchView.OnQueryTextListener {
+
+
     override fun onQueryTextSubmit(query: String): Boolean = false
 
 
     override fun onQueryTextChange(newText: String): Boolean {
 
         Log.d("TAG", "onQueryTextChange: adapter")
-        if(newText.length>2)presenter.loadData(newText)
+        if (newText.length > 2) presenter.loadData(newText)
         return false
     }
 
@@ -40,6 +42,11 @@ class PixabayImagesFragment : Fragment(), PixabayImagesView, XRecyclerView.Loadi
     override fun showMoreData(pixabayImage: List<PixabayImage>) {
         adapter.addPixabayImage(pixabayImage)
     }
+
+    override fun showIsDataNull(pixabayImage: List<PixabayImage>) {
+        adapter.updateIsNullPixabayImage(pixabayImage)
+    }
+
 
     override fun showLoadingMoreProgress(show: Boolean) {
         if (!show) {
@@ -83,9 +90,7 @@ class PixabayImagesFragment : Fragment(), PixabayImagesView, XRecyclerView.Loadi
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true);
-        //TODO !!  - это принудительный каст к not null. его лучше не использовать вообще
-        //тут можно сделать просто inflater?.inflate(R.layout.pxabay_images_fragment, container, false)
-        return inflater!!.inflate(R.layout.pxabay_images_fragment, container, false)
+        return inflater?.inflate(R.layout.pxabay_images_fragment, container, false)
     }
 
 
@@ -111,9 +116,9 @@ class PixabayImagesFragment : Fragment(), PixabayImagesView, XRecyclerView.Loadi
         presenter.attachView(this)
     }
 
-    override fun onPause() {
-        super.onPause()
-        presenter.detachView()
+    override fun onDestroyView() {
+        super.onDestroyView()
+            presenter.detachView()
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
@@ -131,7 +136,7 @@ class PixabayImagesFragment : Fragment(), PixabayImagesView, XRecyclerView.Loadi
                 DividerItemDecoration.VERTICAL))
         pixabayImagesRecyclerView.setAdapter(adapter)
         pixabayImagesRecyclerView.setLoadingListener(this)
-        pixabayImagesRecyclerView.refresh()
+//        pixabayImagesRecyclerView.refresh()
     }
 
 

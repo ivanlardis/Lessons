@@ -1,7 +1,7 @@
 package com.example.i_larin.pixabayreader.presentation.view
 
 import com.example.i_larin.pixabayreader.model.app.PixabayImage
-import com.example.i_larin.pixabayreader.model.app.PixabayImagesVisual
+import com.example.i_larin.pixabayreader.model.app.PixabayImages
 
 /**
  * Created by i_larin on 28.01.17.
@@ -9,6 +9,7 @@ import com.example.i_larin.pixabayreader.model.app.PixabayImagesVisual
 interface PixabayImagesView {
 
     fun showData(pixabayImage: List<PixabayImage>)
+    fun showIsDataNull(pixabayImage: List<PixabayImage>)
 
     fun showMoreData(pixabayImage: List<PixabayImage>)
 
