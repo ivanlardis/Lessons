@@ -3,6 +3,7 @@ package com.example.i_larin.pixabayreader.model.converter
 import android.util.Log
 import com.example.i_larin.pixabayreader.model.app.PixabayImage
 import com.example.i_larin.pixabayreader.model.network.NWPixabayImage
+import timber.log.Timber
 
 /**
  * Created by i_larin on 28.01.17.
@@ -22,7 +23,7 @@ class PixabayImageConverter {
 
             if (name != null) return name
             else {
-                Log.e("getOrDie", "PixabayImageConverter неполнота данных")
+               Timber.e(  "PixabayImageConverter неполнота данных")
                 return nameNull
             }
         }

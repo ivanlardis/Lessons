@@ -1,6 +1,5 @@
 package com.example.i_larin.pixabayreader.presentation.presenter
 
-import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.example.i_larin.pixabayreader.di.DI
@@ -9,6 +8,7 @@ import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.Sta
 import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -26,13 +26,11 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
         DI.componentManager().businessLogicComponent().inject(this)
     }
 
-    companion object {
-        val TAG = "PixabayImagesPresenter"
-    }
+
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        Log.d(TAG, "onFirstViewAttach: pixabayImageRepository")
+       Timber.d(  "onFirstViewAttach: pixabayImageRepository")
         viewState.showPullRefreshEnabled(true)
         compositeSubscription.add(
                 pixabayImageRepository
@@ -43,7 +41,7 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
                             viewState.showLoadingMoreProgress(false)
                             viewState.setTitleActionBar(it.pixabayImagesVisual.tag)
 
-                            Log.d(TAG, "attachView: pixabayImageRepository subscribe" + it.state.name)
+                           Timber.d(  "attachView: pixabayImageRepository subscribe" + it.state.name)
 
                             when (it.state) {
                                 IPixabayImageRepository.State.END_ITEMS -> {
@@ -54,11 +52,11 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
                                     viewState.showData(State.SHOW_MORE, it.pixabayImagesVisual.pixabayImageList)
                                 }
                                 IPixabayImageRepository.State.NEW_ITEMS -> {
-                                    Log.d(TAG, "attachView: pixabayImageRepository" + it.pixabayImagesVisual.pixabayImageList.size)
+                                   Timber.d(  "attachView: pixabayImageRepository" + it.pixabayImagesVisual.pixabayImageList.size)
                                     viewState.showData(State.SHOW, it.pixabayImagesVisual.pixabayImageList)
                                 }
                                 IPixabayImageRepository.State.ERROR -> {
-                                    Log.d(TAG, "attachView: pixabayImageRepository ERROR")
+                                   Timber.d(  "attachView: pixabayImageRepository ERROR")
                                     viewState.notifyUser(it.state.description)
                                     viewState.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
                                 }
@@ -69,13 +67,13 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
     }
 
     fun loadDataMore() {
-        Log.e(TAG, "loadDataMore: pixabayImageRepository")
+       Timber.e("loadDataMore: pixabayImageRepository")
         pixabayImageRepository.loadMore(null, false)
         viewState.showLoadingMoreProgress(true)
     }
 
     fun loadData(tag: String?) {
-        Log.e(TAG, "loadData: pixabayImageRepository")
+       Timber.e("loadData: pixabayImageRepository")
         pixabayImageRepository.loadMore(tag, true)
         viewState.showPullRefreshEnabled(true)
     }
@@ -83,7 +81,7 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
     override fun onDestroy() {
         super.onDestroy()
         compositeSubscription.clear()
-        Log.d(TAG, "onDestroy: PixabayImagesPresenter ")
+       Timber.d("onDestroy: PixabayImagesPresenter ")
     }
 
 }

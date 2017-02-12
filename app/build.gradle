@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+def Properties props = new Properties()
+props.load(project.rootProject.file('parametrs.properties').newDataInputStream())
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
@@ -11,7 +14,11 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        buildConfigField "boolean", "WITH_LOGS", props["WITH_LOGS"]
+        buildConfigField "boolean", "DEMO_VERSION_CONTENTS", props["DEMO_VERSION_CONTENTS"]
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -22,7 +29,22 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+    productFlavors {
 
+        developerVersion {
+            applicationId "com.example.i_larin.developerVersion"
+
+
+            project.ext.set("archivesBaseName",
+                    'developer-' +'log='+props["WITH_LOGS"]+'DEMO='+props["DEMO_VERSION_CONTENTS"]+ ' versionName-' + versionName);
+        }
+        productionVersion {
+            applicationId "com.example.i_larin.productionVersion"
+
+            project.ext.set("archivesBaseName",
+                    'production-' + 'log='+props["WITH_LOGS"]+'DEMO='+props["DEMO_VERSION_CONTENTS"] +  ' versionName-'+ versionName);
+        }
+    }
 
 }
 kapt {
@@ -66,6 +88,8 @@ dependencies {
 
     compile 'com.arello-mobile:moxy-app-compat:1.4.5'
 
+
+    compile 'com.jakewharton.timber:timber:4.5.1'
 
 }
 repositories {

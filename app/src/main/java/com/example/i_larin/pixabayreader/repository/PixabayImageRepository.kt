@@ -1,6 +1,5 @@
 package com.example.i_larin.pixabayreader.repository
 
-import android.util.Log
 import com.example.i_larin.pixabayreader.model.app.PixabayImage
 import com.example.i_larin.pixabayreader.model.app.PixabayImages
 import com.example.i_larin.pixabayreader.model.converter.PixabayImageConverter
@@ -11,6 +10,7 @@ import com.f2prateek.rx.preferences.RxSharedPreferences
 import rx.Observable
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
@@ -39,9 +39,7 @@ class PixabayImageRepository : IPixabayImageRepository {
     private var pageSize = 20
     private var total: AtomicInteger = AtomicInteger(-1)
 
-    companion object {
-        val TAG = "PixabayImageRepository"
-    }
+
 
     constructor(api: PixabayImageApi, rxSharedPreferences: RxSharedPreferences) {
         this.api = api
@@ -75,7 +73,7 @@ class PixabayImageRepository : IPixabayImageRepository {
             getData().subscribeOn(Schedulers.io())
                     .subscribe(
                             {
-                                Log.d(TAG, "loadMore: next")
+                               Timber.d("loadMore: next")
                                 pixabayImageList.addAll(it)
                                 subjectDataChange.onNext(PixabayImageResponce(
                                         if (aNew) State.NEW_ITEMS

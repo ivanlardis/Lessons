@@ -2,25 +2,24 @@ package com.example.i_larin.pixabayreader.ui.fragment
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.*
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
+import com.example.i_larin.pixabayreader.BuildConfig
 import com.example.i_larin.pixabayreader.R
 import com.example.i_larin.pixabayreader.model.app.PixabayImage
 import com.example.i_larin.pixabayreader.presentation.presenter.PixabayImagesPresenter
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.State
-
 import com.jcodecraeer.xrecyclerview.XRecyclerView
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.pxabay_images_fragment.*
+import timber.log.Timber
 
 
 /**
@@ -33,14 +32,14 @@ class PixabayImagesFragment : MvpAppCompatFragment(), PixabayImagesView, XRecycl
     lateinit var presenter: PixabayImagesPresenter
 
     companion object {
-        val TAG = "PixabayImagesFragment"
+
         fun newInstance(): PixabayImagesFragment {
             return PixabayImagesFragment()
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setHasOptionsMenu(true);
+        if (!BuildConfig.DEMO_VERSION_CONTENTS) setHasOptionsMenu(true);
         return inflater?.inflate(R.layout.pxabay_images_fragment, container, false)
     }
 
@@ -58,7 +57,7 @@ class PixabayImagesFragment : MvpAppCompatFragment(), PixabayImagesView, XRecycl
         val actionBar = (activity as AppCompatActivity).supportActionBar
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(false)
-            actionBar.title = title
+            actionBar.title = if (BuildConfig.DEMO_VERSION_CONTENTS) "Демо версия без поиска" else title
         }
     }
 
@@ -66,28 +65,28 @@ class PixabayImagesFragment : MvpAppCompatFragment(), PixabayImagesView, XRecycl
 
 
     override fun onQueryTextChange(newText: String): Boolean {
-        Log.d("TAG", "onQueryTextChange: adapter")
+        Timber.d("onQueryTextChange: adapter")
         if (newText.length > 2) presenter.loadData(newText)
         return false
     }
 
     override fun showData(state: State, pixabayImage: List<PixabayImage>) = when (state) {
         State.SHOW -> {
-            Log.d(TAG, "showData: adapter")
+            Timber.d("showData: adapter")
             adapter.updatePixabayImage(pixabayImage)
         }
         State.SHOW_MORE -> {
-            Log.d(TAG, "showMoreData: adapter")
+            Timber.d("showMoreData: adapter")
             adapter.addPixabayImage(pixabayImage)
         }
         State.SHOW_IS_DATA_NULL -> {
-            Log.d(TAG, "showIsDataNull: adapter")
+            Timber.d("showIsDataNull: adapter")
             adapter.updateIsNullPixabayImage(pixabayImage)
         }
     }
 
     override fun showLoadingMoreProgress(show: Boolean) {
-        Log.d(TAG, "showLoadingMoreProgress: show=" + show)
+        Timber.d("showLoadingMoreProgress: show=" + show)
         if (show) {
             pixabayImagesRecyclerView.onLoadMoreWithoutListener()
         } else {
@@ -96,7 +95,7 @@ class PixabayImagesFragment : MvpAppCompatFragment(), PixabayImagesView, XRecycl
     }
 
     override fun showPullRefreshEnabled(show: Boolean) {
-        Log.d(TAG, "showPullRefreshEnabled: show=" + show)
+        Timber.d("showPullRefreshEnabled: show=" + show)
         if (show) {
             pixabayImagesRecyclerView.refreshWithoutListener()
         } else {
