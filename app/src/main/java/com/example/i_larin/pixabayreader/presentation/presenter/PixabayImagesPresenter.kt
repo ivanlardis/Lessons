@@ -39,28 +39,28 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
                         .getObserverDataChange()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            viewState?.showPullRefreshEnabled(false)
-                            viewState?.showLoadingMoreProgress(false)
-                            viewState?.setTitleActionBar(it.pixabayImagesVisual.tag)
+                            viewState.showPullRefreshEnabled(false)
+                            viewState.showLoadingMoreProgress(false)
+                            viewState.setTitleActionBar(it.pixabayImagesVisual.tag)
 
                             Log.d(TAG, "attachView: pixabayImageRepository subscribe" + it.state.name)
 
                             when (it.state) {
                                 IPixabayImageRepository.State.END_ITEMS -> {
-                                    viewState?.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
-                                    viewState?.notifyUser("Конец загрузки")
+                                    viewState.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
+                                    viewState.notifyUser("Конец загрузки")
                                 }
                                 IPixabayImageRepository.State.NEXT_ITEMS -> {
-                                    viewState?.showData(State.SHOW_MORE, it.pixabayImagesVisual.pixabayImageList)
+                                    viewState.showData(State.SHOW_MORE, it.pixabayImagesVisual.pixabayImageList)
                                 }
                                 IPixabayImageRepository.State.NEW_ITEMS -> {
                                     Log.d(TAG, "attachView: pixabayImageRepository" + it.pixabayImagesVisual.pixabayImageList.size)
-                                    viewState?.showData(State.SHOW, it.pixabayImagesVisual.pixabayImageList)
+                                    viewState.showData(State.SHOW, it.pixabayImagesVisual.pixabayImageList)
                                 }
                                 IPixabayImageRepository.State.ERROR -> {
                                     Log.d(TAG, "attachView: pixabayImageRepository ERROR")
-                                    viewState?.notifyUser(it.state.description)
-                                    viewState?.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
+                                    viewState.notifyUser(it.state.description)
+                                    viewState.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
                                 }
                             }
 
@@ -71,13 +71,13 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
     fun loadDataMore() {
         Log.e(TAG, "loadDataMore: pixabayImageRepository")
         pixabayImageRepository.loadMore(null, false)
-        viewState?.showLoadingMoreProgress(true)
+        viewState.showLoadingMoreProgress(true)
     }
 
     fun loadData(tag: String?) {
         Log.e(TAG, "loadData: pixabayImageRepository")
         pixabayImageRepository.loadMore(tag, true)
-        viewState?.showPullRefreshEnabled(true)
+        viewState.showPullRefreshEnabled(true)
     }
 
     override fun onDestroy() {
