@@ -2,8 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-def Properties props = new Properties()
-props.load(project.rootProject.file('parametrs.properties').newDataInputStream())
+
 
 android {
     compileSdkVersion 25
@@ -14,11 +13,17 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-        buildConfigField "boolean", "WITH_LOGS", props["WITH_LOGS"]
-        buildConfigField "boolean", "DEMO_VERSION_CONTENTS", props["DEMO_VERSION_CONTENTS"]
+
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+
+        def Properties props = new Properties()
+        props.load(project.rootProject.file('parametrs.properties').newDataInputStream())
+        buildConfigField "boolean", "WITH_LOGS", props["WITH_LOGS"]
+        buildConfigField "boolean", "DEMO_VERSION_CONTENTS", props["DEMO_VERSION_CONTENTS"]
+        project.ext.set("archivesBaseName",
+               'log-'+props["WITH_LOGS"]+'demo-'+props["DEMO_VERSION_CONTENTS"]);
     }
     buildTypes {
         release {
@@ -35,14 +40,12 @@ android {
             applicationId "com.example.i_larin.developerVersion"
 
 
-            project.ext.set("archivesBaseName",
-                    'developer-' +'log='+props["WITH_LOGS"]+'DEMO='+props["DEMO_VERSION_CONTENTS"]+ ' versionName-' + versionName);
+
         }
         productionVersion {
             applicationId "com.example.i_larin.productionVersion"
 
-            project.ext.set("archivesBaseName",
-                    'production-' + 'log='+props["WITH_LOGS"]+'DEMO='+props["DEMO_VERSION_CONTENTS"] +  ' versionName-'+ versionName);
+
         }
     }
 
