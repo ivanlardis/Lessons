@@ -5,12 +5,11 @@ import com.example.i_larin.pixabayreader.model.app.PixabayImages
 import com.example.i_larin.pixabayreader.model.converter.PixabayImageConverter
 import com.example.i_larin.pixabayreader.network.PixabayImageApi
 import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.PixabayImageResponce
-import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.State
+import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.State.*
 import com.f2prateek.rx.preferences.RxSharedPreferences
 import rx.Observable
 import rx.schedulers.Schedulers
 import rx.subjects.BehaviorSubject
-import timber.log.Timber
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
@@ -40,7 +39,6 @@ class PixabayImageRepository : IPixabayImageRepository {
     private var total: AtomicInteger = AtomicInteger(-1)
 
 
-
     constructor(api: PixabayImageApi, rxSharedPreferences: RxSharedPreferences) {
         this.api = api
         this.rxSharedPreferences = rxSharedPreferences
@@ -53,9 +51,9 @@ class PixabayImageRepository : IPixabayImageRepository {
     override fun getObserverDataChange(): Observable<PixabayImageResponce>
             = subjectDataChange.asObservable()
 
-
+//TODO  i.larin  в методах ошибка логики, пока не готовы к рефакторингу на котлин
     override fun loadMore(query: String?, aNew: Boolean) {
-        if (query != null) rxSharedPreferences.getString(DEFAULT_TEXT_SEARCH_SP, DEFAULT_TEXT).set(query)
+        query?.let { rxSharedPreferences.getString(DEFAULT_TEXT_SEARCH_SP, DEFAULT_TEXT).set(it) }
 
         if (aNew) {
             pixabayImageList.clear()
@@ -63,27 +61,23 @@ class PixabayImageRepository : IPixabayImageRepository {
         } else {
             pageNo++
             if (isEndItems()) {
-                subjectDataChange.onNext(PixabayImageResponce(State.END_ITEMS,
+                subjectDataChange.onNext(PixabayImageResponce(END_ITEMS,
                         PixabayImages(getTextQuery(), cloneCopyOnWriteArrayListToArray(pixabayImageList))))
             }
         }
-
         if (!(isEndItems() && !aNew))
-
             getData().subscribeOn(Schedulers.io())
                     .subscribe(
                             {
-                               Timber.d("loadMore: next")
                                 pixabayImageList.addAll(it)
                                 subjectDataChange.onNext(PixabayImageResponce(
-                                        if (aNew) State.NEW_ITEMS
-                                        else State.NEXT_ITEMS,
+                                        if (aNew) NEW_ITEMS
+                                        else NEXT_ITEMS,
                                         PixabayImages(getTextQuery(), cloneCopyOnWriteArrayListToArray(pixabayImageList))))
                             },
                             {
-                                var state = State.ERROR
+                                var state = ERROR
                                 pixabayImageList.clone()
-
                                 state.description = it.toString()
                                 subjectDataChange.onNext(PixabayImageResponce(state,
                                         PixabayImages(getTextQuery(), cloneCopyOnWriteArrayListToArray(pixabayImageList))))
@@ -91,32 +85,31 @@ class PixabayImageRepository : IPixabayImageRepository {
     }
 
 
-    private fun getData(): Observable<List<PixabayImage>> = api.getImages(PIXABAY_API_KEY, getTextQuery(), pageNo, pageSize)
-            .map {
-                total.set(it.total)
-                return@map it.hits
-            }
-            .flatMap {
-                Observable.from(it)
-            }
-            .map {
-                PixabayImageConverter.fromNetwork(it)
-            }
-            .toList()
+    private fun getData(): Observable<List<PixabayImage>> =
+            api.getImages(PIXABAY_API_KEY,
+                    getTextQuery(),
+                    pageNo,
+                    pageSize)
+                    .map {
+                        total.set(it.total)
+                        return@map it.hits
+                    }
+                    .flatMap {
+                        Observable.from(it)
+                    }
+                    .map {
+                        PixabayImageConverter.fromNetwork(it)
+                            }
+                    .toList()
 
 
-    private fun getTextQuery(): String {
-        return rxSharedPreferences.getString(DEFAULT_TEXT_SEARCH_SP, DEFAULT_TEXT).get()!!
-
-    }
+    private fun getTextQuery() =
+            (rxSharedPreferences.getString(DEFAULT_TEXT_SEARCH_SP, DEFAULT_TEXT)
+                    .get())?.let { it } ?: DEFAULT_TEXT
 
     private fun isEndItems(): Boolean = (total.get() > 0 && total.get() < (pageNo - 1) * pageSize)
 
     private fun cloneCopyOnWriteArrayListToArray(pixabayImageList: CopyOnWriteArrayList<PixabayImage>)
-            : ArrayList<PixabayImage> {
-        var list: ArrayList<PixabayImage> = ArrayList<PixabayImage>()
-        list.addAll(pixabayImageList)
-        return list
-    }
+            = (ArrayList<PixabayImage>()).apply { addAll(pixabayImageList) }
 
 }

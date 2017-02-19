@@ -5,7 +5,9 @@ import com.arellomobile.mvp.MvpPresenter
 import com.example.i_larin.pixabayreader.di.DI
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.State
+import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.State.*
 import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository
+import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.State.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
 import timber.log.Timber
@@ -18,7 +20,7 @@ import javax.inject.Inject
 @InjectViewState
 class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
 
-    private var compositeSubscription: CompositeSubscription = CompositeSubscription()
+    private var compositeSubscription = CompositeSubscription()
     @Inject
     lateinit var pixabayImageRepository: IPixabayImageRepository
 
@@ -27,61 +29,66 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
     }
 
 
-
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-       Timber.d(  "onFirstViewAttach: pixabayImageRepository")
-        viewState.showPullRefreshEnabled(true)
+        showRefresh()
         compositeSubscription.add(
                 pixabayImageRepository
                         .getObserverDataChange()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            viewState.showPullRefreshEnabled(false)
-                            viewState.showLoadingMoreProgress(false)
-                            viewState.setTitleActionBar(it.pixabayImagesVisual.tag)
-
-                           Timber.d(  "attachView: pixabayImageRepository subscribe" + it.state.name)
-
-                            when (it.state) {
-                                IPixabayImageRepository.State.END_ITEMS -> {
-                                    viewState.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
-                                    viewState.notifyUser("Конец загрузки")
-                                }
-                                IPixabayImageRepository.State.NEXT_ITEMS -> {
-                                    viewState.showData(State.SHOW_MORE, it.pixabayImagesVisual.pixabayImageList)
-                                }
-                                IPixabayImageRepository.State.NEW_ITEMS -> {
-                                   Timber.d(  "attachView: pixabayImageRepository" + it.pixabayImagesVisual.pixabayImageList.size)
-                                    viewState.showData(State.SHOW, it.pixabayImagesVisual.pixabayImageList)
-                                }
-                                IPixabayImageRepository.State.ERROR -> {
-                                   Timber.d(  "attachView: pixabayImageRepository ERROR")
-                                    viewState.notifyUser(it.state.description)
-                                    viewState.showData(State.SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
-                                }
-                            }
-
-                        }, {}, {})
+                        .subscribe({ showData(it) }, {}, {})
         )
     }
 
+    private fun showData(it: IPixabayImageRepository.PixabayImageResponce) =
+            with(viewState)
+            {
+                stopProgressView()
+                setTitleActionBar(it.pixabayImagesVisual.tag)
+                when (it.state) {
+                    END_ITEMS -> {
+                        showData(SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
+                        notifyUser("Конец загрузки")
+                    }
+                    NEXT_ITEMS -> {
+                        showData(SHOW_MORE, it.pixabayImagesVisual.pixabayImageList)
+                    }
+                    NEW_ITEMS -> {
+                        showData(SHOW, it.pixabayImagesVisual.pixabayImageList)
+                    }
+                    ERROR -> {
+                        notifyUser(it.state.description)
+                        showData(SHOW_IS_DATA_NULL, it.pixabayImagesVisual.pixabayImageList)
+                    }
+                }
+            }
+
+
+    private fun PixabayImagesView.stopProgressView() {
+        showPullRefreshEnabled(false)
+        showLoadingMoreProgress(false)
+    }
+
     fun loadDataMore() {
-       Timber.e("loadDataMore: pixabayImageRepository")
+        showLoadingMore()
         pixabayImageRepository.loadMore(null, false)
-        viewState.showLoadingMoreProgress(true)
     }
 
     fun loadData(tag: String?) {
-       Timber.e("loadData: pixabayImageRepository")
+        showRefresh()
         pixabayImageRepository.loadMore(tag, true)
-        viewState.showPullRefreshEnabled(true)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         compositeSubscription.clear()
-       Timber.d("onDestroy: PixabayImagesPresenter ")
     }
 
+    private fun showLoadingMore() {
+        viewState.showLoadingMoreProgress(true)
+    }
+
+    private fun showRefresh() {
+        viewState.showPullRefreshEnabled(true)
+    }
 }

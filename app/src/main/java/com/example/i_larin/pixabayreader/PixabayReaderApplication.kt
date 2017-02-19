@@ -8,6 +8,10 @@ import timber.log.Timber
  * Created by i_larin on 28.01.17.
  */
 class PixabayReaderApplication : Application() {
+    companion object {
+        fun isDemoContent() = !BuildConfig.DEMO_VERSION_CONTENTS
+    }
+
     override fun onCreate() {
         super.onCreate()
         DI.init(applicationContext)
@@ -15,7 +19,6 @@ class PixabayReaderApplication : Application() {
         if (BuildConfig.WITH_LOGS) {
             Timber.plant(Timber.DebugTree())
         }
-
     }
 }
 
