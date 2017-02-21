@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 /**
  * Created by i_larin on 28.01.17.
  */
+// TODO Ctrl + Alt + L
 class ApiFactoty {
     private var retrofit: Retrofit
 

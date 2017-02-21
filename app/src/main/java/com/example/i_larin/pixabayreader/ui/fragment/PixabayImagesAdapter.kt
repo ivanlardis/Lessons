@@ -26,7 +26,9 @@ class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapte
         return ViewHolder(item)
     }
 
+    // TODO use property syntax
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // TODO use holder.itemView.context, remove fragment from constructor
         Picasso.with(fragment.activity)
                 .load(dataset.get(position).previewURL)
                 .into(holder.mImageView)
@@ -41,6 +43,7 @@ class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapte
 
     fun updateIsNullPixabayImage(performer: List<PixabayImage>) {
         if (dataset.size == 0) updatePixabayImage(performer)
+        // TODO if (dataset.isEmpty()) updatePixabayImage(performer)
     }
 
     fun updatePixabayImage(performer: List<PixabayImage>) {

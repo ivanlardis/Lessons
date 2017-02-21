@@ -18,5 +18,7 @@ class CacheInterceptor : Interceptor {
                 .maxStale(1, TimeUnit.DAYS).build()
         request = request.newBuilder().header("Cache-Control", cacheControl.toString()).build()
         return chain.proceed(request)
+
+        // TODO use fluent codestyle
     }
 }

@@ -18,7 +18,8 @@ class PixabayImageConverter {
                         getOrDie(nWPixabayImage.previewURL, DEFAULT_PREVIEW_URL),
                         getOrDie(nWPixabayImage.tags, "Нет тегов"))
 
-        fun getOrDie(name: String?, nameNull: String) = name?.let { name } ?: nameNull
+        fun getOrDie(name: String?, nameNull: String) = name?.let { it } ?: nameNull
+        fun getOrDie_(name: String?, nameNull: String) = name ?: nameNull
 
     }
 

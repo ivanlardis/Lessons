@@ -106,6 +106,7 @@ class PixabayImageRepository : IPixabayImageRepository {
     private fun getTextQuery() =
             (rxSharedPreferences.getString(DEFAULT_TEXT_SEARCH_SP, DEFAULT_TEXT)
                     .get())?.let { it } ?: DEFAULT_TEXT
+    // TODO unusual ?.let { it }
 
     private fun isEndItems(): Boolean = (total.get() > 0 && total.get() < (pageNo - 1) * pageSize)
 

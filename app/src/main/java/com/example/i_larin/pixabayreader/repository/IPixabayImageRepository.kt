@@ -12,6 +12,7 @@ interface IPixabayImageRepository {
 
     fun loadMore(query: String?, aNew: Boolean)
 
+    // TODO extract entities from interface
     enum class State {
         ERROR,
         NEXT_ITEMS,
