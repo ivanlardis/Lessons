@@ -13,12 +13,21 @@ class CacheInterceptor : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        var request = chain.request()
-        val cacheControl = CacheControl.Builder().maxAge(7, TimeUnit.DAYS)
-                .maxStale(1, TimeUnit.DAYS).build()
-        request = request.newBuilder().header("Cache-Control", cacheControl.toString()).build()
-        return chain.proceed(request)
+        val cacheControl = CacheControl
+                .Builder()
+                .maxAge(7, TimeUnit.DAYS)
+                .maxStale(1, TimeUnit.DAYS)
+                .build()
 
-        // TODO use fluent codestyle
+        var request = chain
+                .request()
+                .newBuilder()
+                .header("Cache-Control", cacheControl.toString())
+                .build()
+
+        return chain
+                .proceed(request)
+
+
     }
 }

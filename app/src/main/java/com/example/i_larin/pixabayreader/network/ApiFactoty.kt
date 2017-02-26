@@ -7,22 +7,22 @@ import retrofit2.Retrofit
 /**
  * Created by i_larin on 28.01.17.
  */
-// TODO Ctrl + Alt + L
+
 class ApiFactoty {
     private var retrofit: Retrofit
 
     constructor(baseUrl: String,
                 converterFactory: Converter.Factory,
                 callAdapterFactory: CallAdapter.Factory,
-                okHttpClientFactory : OkHttpClientFactory) {
+                okHttpClientFactory: OkHttpClientFactory) {
         retrofit = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(okHttpClientFactory.provideOkHttpClient())
                 .addCallAdapterFactory(callAdapterFactory)
                 .addConverterFactory(converterFactory)
                 .build()
-            }
+    }
 
-    fun create(java: Class<PixabayImageApi>)=retrofit.create(java)
+    fun create(java: Class<PixabayImageApi>) = retrofit.create(java)
 
 }

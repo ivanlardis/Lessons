@@ -4,8 +4,9 @@ import com.example.i_larin.pixabayreader.model.app.PixabayImage
 import com.example.i_larin.pixabayreader.model.app.PixabayImages
 import com.example.i_larin.pixabayreader.model.converter.PixabayImageConverter
 import com.example.i_larin.pixabayreader.network.PixabayImageApi
-import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.PixabayImageResponce
-import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.State.*
+import com.example.i_larin.pixabayreader.repository.model.ResponceRepository
+import com.example.i_larin.pixabayreader.repository.model.StateRepository
+import com.example.i_larin.pixabayreader.repository.model.StateRepository.*
 import com.f2prateek.rx.preferences.RxSharedPreferences
 import rx.Observable
 import rx.schedulers.Schedulers
@@ -29,7 +30,7 @@ class PixabayImageRepository : IPixabayImageRepository {
 
     private val rxSharedPreferences: RxSharedPreferences
 
-    private var subjectDataChange = BehaviorSubject.create<PixabayImageResponce>();
+    private var subjectDataChange = BehaviorSubject.create<ResponceRepository>();
 
     private val pixabayImageList: CopyOnWriteArrayList<PixabayImage> =
             CopyOnWriteArrayList<PixabayImage>()
@@ -48,7 +49,7 @@ class PixabayImageRepository : IPixabayImageRepository {
         loadMore(null, true)
     }
 
-    override fun getObserverDataChange(): Observable<PixabayImageResponce>
+    override fun getObserverDataChange(): Observable<ResponceRepository>
             = subjectDataChange.asObservable()
 
 //TODO  i.larin  в методах ошибка логики, пока не готовы к рефакторингу на котлин
@@ -61,7 +62,7 @@ class PixabayImageRepository : IPixabayImageRepository {
         } else {
             pageNo++
             if (isEndItems()) {
-                subjectDataChange.onNext(PixabayImageResponce(END_ITEMS,
+                subjectDataChange.onNext(ResponceRepository(END_ITEMS,
                         PixabayImages(getTextQuery(), cloneCopyOnWriteArrayListToArray(pixabayImageList))))
             }
         }
@@ -70,7 +71,7 @@ class PixabayImageRepository : IPixabayImageRepository {
                     .subscribe(
                             {
                                 pixabayImageList.addAll(it)
-                                subjectDataChange.onNext(PixabayImageResponce(
+                                subjectDataChange.onNext(ResponceRepository(
                                         if (aNew) NEW_ITEMS
                                         else NEXT_ITEMS,
                                         PixabayImages(getTextQuery(), cloneCopyOnWriteArrayListToArray(pixabayImageList))))
@@ -79,7 +80,7 @@ class PixabayImageRepository : IPixabayImageRepository {
                                 var state = ERROR
                                 pixabayImageList.clone()
                                 state.description = it.toString()
-                                subjectDataChange.onNext(PixabayImageResponce(state,
+                                subjectDataChange.onNext(ResponceRepository(state,
                                         PixabayImages(getTextQuery(), cloneCopyOnWriteArrayListToArray(pixabayImageList))))
                             }, { })
     }
@@ -105,8 +106,8 @@ class PixabayImageRepository : IPixabayImageRepository {
 
     private fun getTextQuery() =
             (rxSharedPreferences.getString(DEFAULT_TEXT_SEARCH_SP, DEFAULT_TEXT)
-                    .get())?.let { it } ?: DEFAULT_TEXT
-    // TODO unusual ?.let { it }
+                    ?.get()) ?: DEFAULT_TEXT
+
 
     private fun isEndItems(): Boolean = (total.get() > 0 && total.get() < (pageNo - 1) * pageSize)
 

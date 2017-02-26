@@ -16,7 +16,7 @@ import java.util.*
 /**
  * Created by i_larin on 28.01.17.
  */
-class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapter<PixabayImagesAdapter.ViewHolder>() {
+class PixabayImagesAdapter() : RecyclerView.Adapter<PixabayImagesAdapter.ViewHolder>() {
     private val dataset: MutableList<PixabayImage> = ArrayList()
 
 
@@ -26,15 +26,14 @@ class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapte
         return ViewHolder(item)
     }
 
-    // TODO use property syntax
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        // TODO use holder.itemView.context, remove fragment from constructor
-        Picasso.with(fragment.activity)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder)
+    {
+        Picasso.with(itemView.context)
                 .load(dataset.get(position).previewURL)
-                .into(holder.mImageView)
-        holder.mTextViewName.setText(dataset.get(position).tags)
-
+                .into(mImageView)
+        mTextViewName.setText(dataset.get(position).tags)
     }
+
 
     fun addPixabayImage(performer: List<PixabayImage>) {
         dataset.addAll(performer.subList(dataset.size, performer.size - 1))
@@ -42,8 +41,7 @@ class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapte
     }
 
     fun updateIsNullPixabayImage(performer: List<PixabayImage>) {
-        if (dataset.size == 0) updatePixabayImage(performer)
-        // TODO if (dataset.isEmpty()) updatePixabayImage(performer)
+        if (dataset.isEmpty()) updatePixabayImage(performer)
     }
 
     fun updatePixabayImage(performer: List<PixabayImage>) {
@@ -57,8 +55,8 @@ class PixabayImagesAdapter(private val fragment: Fragment) : RecyclerView.Adapte
 
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var mImageView: ImageView =v.imageViewItem
-        var mTextViewName: TextView= v.textViewItem
+        var mImageView: ImageView = v.imageViewItem
+        var mTextViewName: TextView = v.textViewItem
     }
 
 }

@@ -96,7 +96,7 @@ class PixabayImagesFragment : MvpAppCompatFragment(), PixabayImagesView, XRecycl
     }
 
     private fun configureRecyclerViewAndAdapter() {
-        adapter = PixabayImagesAdapter(this)
+        adapter = PixabayImagesAdapter( )
         with(pixabayImagesRecyclerView)
         {
             setLayoutManager(LinearLayoutManager(activity.applicationContext))

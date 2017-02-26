@@ -4,13 +4,13 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.example.i_larin.pixabayreader.di.DI
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView
-import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.State
 import com.example.i_larin.pixabayreader.presentation.view.PixabayImagesView.State.*
 import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository
-import com.example.i_larin.pixabayreader.repository.IPixabayImageRepository.State.*
+import com.example.i_larin.pixabayreader.repository.model.ResponceRepository
+import com.example.i_larin.pixabayreader.repository.model.StateRepository
+import com.example.i_larin.pixabayreader.repository.model.StateRepository.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.subscriptions.CompositeSubscription
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -40,7 +40,7 @@ class PixabayImagesPresenter : MvpPresenter<PixabayImagesView>() {
         )
     }
 
-    private fun showData(it: IPixabayImageRepository.PixabayImageResponce) =
+    private fun showData(it: ResponceRepository) =
             with(viewState)
             {
                 stopProgressView()
