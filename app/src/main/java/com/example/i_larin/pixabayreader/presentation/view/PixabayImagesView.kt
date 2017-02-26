@@ -15,21 +15,13 @@ import com.example.i_larin.pixabayreader.model.app.PixabayImages
 @StateStrategyType(value = AddToEndSingleStrategy::class)
 interface PixabayImagesView : MvpView {
 
-    fun showData(state: State, pixabayImage: List<PixabayImage>)
+    fun showData(pixabayImage: List<PixabayImages>?)
 
-    fun showLoadingMoreProgress(show: Boolean)
 
-    fun showPullRefreshEnabled(show: Boolean)
-
-    fun setTitleActionBar(title: String)
     @StateStrategyType(value = SkipStrategy::class)
     fun notifyUser(errorName: String)
 
-    enum class State {
-        SHOW,
-        SHOW_MORE,
-        SHOW_IS_DATA_NULL
+    fun stopRefresh()
 
-    }
 }
 

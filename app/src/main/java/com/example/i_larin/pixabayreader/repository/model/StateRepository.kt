@@ -5,9 +5,7 @@ package com.example.i_larin.pixabayreader.repository.model
  */
 enum class StateRepository {
     ERROR,
-    NEXT_ITEMS,
-    NEW_ITEMS,
-    END_ITEMS;
+    NEW_ITEMS;
 
     var description: String = ""
 }

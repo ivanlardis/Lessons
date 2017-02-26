@@ -11,5 +11,5 @@ interface IPixabayImageRepository {
 
     fun getObserverDataChange(): Observable<ResponceRepository>
 
-    fun loadMore(query: String?, aNew: Boolean)
+    fun loadData( )
 }
